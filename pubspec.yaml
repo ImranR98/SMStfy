@@ -1,0 +1,36 @@
+name: smstfy
+description: "SMS gateway powered by ntfy"
+publish_to: 'none'
+
+version: 1.0.2+3
+
+environment:
+  sdk: '>=3.2.3 <4.0.0'
+
+dependencies:
+  flutter:
+    sdk: flutter
+  cupertino_icons: ^1.0.2
+  path: ^1.8.3
+  flutter_launcher_icons: ^0.13.1
+  animations: ^2.0.11
+  sms_advanced:
+    git:
+      url: https://github.com/EddieKamau/sms_advanced.git
+      ref: master
+  ntfluttery: ^0.1.1
+  flutter_foreground_task: ^6.5.0
+  shared_preferences: ^2.2.3
+  provider: ^6.1.2
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^4.0.0
+
+flutter_launcher_icons:
+  android: "ic_launcher"
+  image_path: "assets/graphics/icon.png"
+
+flutter:
+  uses-material-design: true
