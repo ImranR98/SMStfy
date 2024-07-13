@@ -5,10 +5,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_background_service/flutter_background_service.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:provider/provider.dart';
-import 'package:sms_advanced/sms_advanced.dart';
 import 'package:smstfy/components/custom_app_bar.dart';
 import 'package:smstfy/components/settings_form.dart';
 import 'package:smstfy/providers/settings_provider.dart';
+import 'package:smstfy/providers/sms_provider.dart';
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
@@ -69,11 +69,11 @@ void onStart(ServiceInstance service) async {
     service.stopSelf();
   });
 
-  SmsReceiver receiver = SmsReceiver();
   SettingsProvider settingsProvider = SettingsProvider();
   await settingsProvider.initializeSettings();
-  receiver.onSmsReceived?.listen((SmsMessage msg) {
-    print(msg.body);
+
+  SmsReceiver.startListening((message) {
+    print(message);
   });
 }
 
