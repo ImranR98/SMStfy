@@ -1,80 +1,20 @@
-import 'dart:async';
 import 'dart:ui';
 
 import 'package:flutter/material.dart';
-import 'package:flutter_background_service/flutter_background_service.dart';
-import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+import 'package:permission_handler/permission_handler.dart';
 import 'package:provider/provider.dart';
+import 'package:sms_advanced/sms_advanced.dart';
 import 'package:smstfy/components/custom_app_bar.dart';
 import 'package:smstfy/components/settings_form.dart';
 import 'package:smstfy/providers/settings_provider.dart';
-import 'package:smstfy/providers/sms_provider.dart';
 
 void main() {
-  WidgetsFlutterBinding.ensureInitialized();
-  initializeService();
-
   runApp(MultiProvider(
     providers: [
       ChangeNotifierProvider(create: (context) => SettingsProvider()),
     ],
     child: const SMStfy(),
   ));
-}
-
-Future<void> initializeService() async {
-  final service = FlutterBackgroundService();
-
-  const AndroidNotificationChannel channel = AndroidNotificationChannel(
-    'smstfy_foreground',
-    'SMStfy Foreground Service',
-    description:
-        'This notification appears when the SMStfy foreground service is running.',
-    importance: Importance.low,
-  );
-
-  final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
-      FlutterLocalNotificationsPlugin();
-
-  await flutterLocalNotificationsPlugin.initialize(
-    const InitializationSettings(
-      android: AndroidInitializationSettings('ic_bg_service_small'),
-    ),
-  );
-
-  await flutterLocalNotificationsPlugin
-      .resolvePlatformSpecificImplementation<
-          AndroidFlutterLocalNotificationsPlugin>()
-      ?.createNotificationChannel(channel);
-
-  await service.configure(
-    androidConfiguration: AndroidConfiguration(
-      onStart: onStart,
-      autoStart: true,
-      isForegroundMode: true,
-      notificationChannelId: 'smstfy_foreground',
-      initialNotificationTitle: 'Foreground Service',
-      initialNotificationContent: 'SMStfy is running.',
-      foregroundServiceNotificationId: 888,
-    ),
-    iosConfiguration: IosConfiguration(),
-  );
-}
-
-@pragma('vm:entry-point')
-void onStart(ServiceInstance service) async {
-  DartPluginRegistrant.ensureInitialized();
-
-  service.on('stopService').listen((event) {
-    service.stopSelf();
-  });
-
-  SettingsProvider settingsProvider = SettingsProvider();
-  await settingsProvider.initializeSettings();
-
-  SMSProvider.startListening((message) {
-    print(message);
-  });
 }
 
 class SMStfy extends StatelessWidget {
@@ -118,6 +58,28 @@ class NavigationPageItem {
 class _MainPageState extends State<MainPage> {
   late final ScrollController scrollController = ScrollController();
 
+  Future<bool> checkPermissions() async =>
+      (await Permission.sms.isGranted) &&
+      (await Permission.ignoreBatteryOptimizations.isGranted);
+  requestPermissions() async {
+    if (!await Permission.sms.isGranted) {
+      await Permission.sms.request();
+    }
+    if (!await Permission.ignoreBatteryOptimizations.isGranted) {
+      await Permission.ignoreBatteryOptimizations.request();
+    }
+    setState(() {});
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    SmsReceiver receiver = new SmsReceiver();
+    receiver.onSmsReceived?.listen((SmsMessage msg) {
+      print(msg.body); // TODO: Post to Ntfy here and increment the counter.
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -129,9 +91,26 @@ class _MainPageState extends State<MainPage> {
               child: CustomScrollView(
                   physics: const AlwaysScrollableScrollPhysics(),
                   controller: scrollController,
-                  slivers: const <Widget>[
-                    CustomAppBar(title: 'SMStfy'),
-                    SliverToBoxAdapter(child: SettingsForm())
+                  slivers: <Widget>[
+                    const CustomAppBar(title: 'SMStfy'),
+                    SliverToBoxAdapter(
+                        child: Column(
+                      children: [
+                        const SettingsForm(),
+                        FutureBuilder(
+                            future: checkPermissions(),
+                            builder: (ctx, snapshot) {
+                              return (snapshot.data ?? false)
+                                  ? SizedBox.shrink()
+                                  : ElevatedButton(
+                                      onPressed: () {
+                                        requestPermissions();
+                                      },
+                                      child: const Text(
+                                          'Grant Required Permissions'));
+                            })
+                      ],
+                    ))
                   ])),
         ));
   }

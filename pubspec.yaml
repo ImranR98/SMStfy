@@ -18,8 +18,11 @@ dependencies:
   shared_preferences: ^2.2.3
   provider: ^6.1.2
   permission_handler: ^11.3.1
-  flutter_background_service: ^5.0.6
   flutter_local_notifications: ^17.2.1+1
+  sms_advanced:
+    git:
+      url: https://github.com/EddieKamau/sms_advanced.git
+      ref: master
 
 dev_dependencies:
   flutter_test:

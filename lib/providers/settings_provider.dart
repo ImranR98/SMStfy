@@ -45,12 +45,7 @@ class SettingsProvider with ChangeNotifier {
   }
 
   String get ntfyUsername {
-    var res = prefs?.getString('ntfyUsername');
-    if (res == null) {
-      res = getRandomString(16);
-      prefs?.setString('ntfyUsername', res);
-    }
-    return res;
+    return prefs?.getString('ntfyUsername') ?? '';
   }
 
   set ntfyUsername(String ntfyUsername) {
@@ -59,12 +54,7 @@ class SettingsProvider with ChangeNotifier {
   }
 
   String get ntfyPassword {
-    var res = prefs?.getString('ntfyPassword');
-    if (res == null) {
-      res = getRandomString(16);
-      prefs?.setString('ntfyPassword', res);
-    }
-    return res;
+    return prefs?.getString('ntfyPassword') ?? '';
   }
 
   set ntfyPassword(String ntfyPassword) {

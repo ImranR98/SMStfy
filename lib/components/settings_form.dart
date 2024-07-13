@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_background_service/flutter_background_service.dart';
 import 'package:provider/provider.dart';
 import 'package:smstfy/providers/settings_provider.dart';
 
@@ -16,11 +15,11 @@ class _SettingsFormState extends State<SettingsForm> {
   final TextEditingController ntfyPasswordController = TextEditingController();
   final TextEditingController receiveTopicNameController =
       TextEditingController();
+  bool formEnabled = false;
 
   @override
   Widget build(BuildContext context) {
     SettingsProvider settingsProvider = context.watch<SettingsProvider>();
-    final service = FlutterBackgroundService();
     if (settingsProvider.prefs == null) {
       settingsProvider.initializeSettings();
     }
@@ -35,6 +34,7 @@ class _SettingsFormState extends State<SettingsForm> {
             : Form(
                 key: _formKey,
                 child: Column(
+                  mainAxisSize: MainAxisSize.min,
                   children: <Widget>[
                     TextFormField(
                       controller: ntfyUrlController,
@@ -103,7 +103,7 @@ class _SettingsFormState extends State<SettingsForm> {
                       height: 16,
                     ),
                     Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
                         TextButton(
                           onPressed: () {
@@ -123,30 +123,16 @@ class _SettingsFormState extends State<SettingsForm> {
                           },
                           child: const Text('Save Settings'),
                         ),
-                        FutureBuilder(
-                            future: service.isRunning(),
-                            builder: (ctx, snapshot) {
-                              return TextButton(
-                                  style: TextButton.styleFrom(
-                                      foregroundColor: HSLColor.fromColor(
-                                              (snapshot.data ?? false)
-                                                  ? Colors.red
-                                                  : Colors.green)
-                                          .withLightness(
-                                              Theme.of(context).brightness ==
-                                                      Brightness.dark
-                                                  ? 0.8
-                                                  : 0.3)
-                                          .toColor()),
-                                  onPressed: () async {
-                                    (snapshot.data ?? false)
-                                        ? service.invoke('stopService')
-                                        : await service.startService();
-                                    setState(() {});
-                                  },
-                                  child: Text(
-                                      '${(snapshot.data ?? false) ? 'Stop' : 'Start'} SMStfy'));
-                            })
+                        TextButton(
+                          onPressed: () {
+                            // TODO: Test connection with current inputs and report result in snackbar
+                          },
+                          child: Text(
+                            'Test',
+                            style: TextStyle(
+                                color: Theme.of(context).colorScheme.secondary),
+                          ),
+                        )
                       ],
                     )
                   ],
