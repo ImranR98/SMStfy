@@ -17,7 +17,7 @@ class SettingsProvider with ChangeNotifier {
 
   // Not done in constructor as we want to be able to await it
   Future<void> initializeSettings() async {
-    prefs = await SharedPreferences.getInstance();
+    prefs ??= await SharedPreferences.getInstance();
     notifyListeners();
   }
 
@@ -41,6 +41,34 @@ class SettingsProvider with ChangeNotifier {
 
   set receiveTopicName(String receiveTopicName) {
     prefs?.setString('receiveTopicName', receiveTopicName);
+    notifyListeners();
+  }
+
+  String get ntfyUsername {
+    var res = prefs?.getString('ntfyUsername');
+    if (res == null) {
+      res = getRandomString(16);
+      prefs?.setString('ntfyUsername', res);
+    }
+    return res;
+  }
+
+  set ntfyUsername(String ntfyUsername) {
+    prefs?.setString('ntfyUsername', ntfyUsername);
+    notifyListeners();
+  }
+
+  String get ntfyPassword {
+    var res = prefs?.getString('ntfyPassword');
+    if (res == null) {
+      res = getRandomString(16);
+      prefs?.setString('ntfyPassword', res);
+    }
+    return res;
+  }
+
+  set ntfyPassword(String ntfyPassword) {
+    prefs?.setString('ntfyPassword', ntfyPassword);
     notifyListeners();
   }
 }
