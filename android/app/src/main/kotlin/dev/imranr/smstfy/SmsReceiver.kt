@@ -23,10 +23,19 @@ class SmsReceiver : BroadcastReceiver() {
                 }
                 val smsBody = messages.joinToString(separator = "") { it.messageBody }
                 val sender = messages[0].originatingAddress
-                Log.d("SmsReceiver", "Received SMS from: $sender, Message: $smsBody")
+                val timestampMillis = messages[0].timestampMillis
+
+                Log.d("SmsReceiver", "Received SMS from: $sender, Message: $smsBody, Timestamp: $timestampMillis")
+
+                // Create an object with all the message info
+                val messageInfo = mapOf(
+                    "sender" to sender,
+                    "body" to smsBody,
+                    "timestamp" to timestampMillis
+                )
 
                 // Send the SMS data to the Flutter side
-                channel?.invokeMethod("onSmsReceived", smsBody)
+                channel?.invokeMethod("onSmsReceived", messageInfo)
             }
         }
     }

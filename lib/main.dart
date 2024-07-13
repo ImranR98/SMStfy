@@ -72,7 +72,7 @@ void onStart(ServiceInstance service) async {
   SettingsProvider settingsProvider = SettingsProvider();
   await settingsProvider.initializeSettings();
 
-  SmsReceiver.startListening((message) {
+  SMSProvider.startListening((message) {
     print(message);
   });
 }

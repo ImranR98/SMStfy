@@ -1,14 +1,13 @@
 import 'package:flutter/services.dart';
 
-class SmsReceiver {
+class SMSProvider {
   static const MethodChannel _channel = MethodChannel('sms_receiver');
 
-  static void startListening(Function(String) onSmsReceived) {
+  static void startListening(Function(Map<String, dynamic>) onSmsReceived) {
     _channel.setMethodCallHandler((call) async {
       if (call.method == 'onSmsReceived') {
-        onSmsReceived(call.arguments);
+        onSmsReceived(Map<String, dynamic>.from(call.arguments));
       }
     });
-    _channel.invokeMethod('startListening');
   }
 }
