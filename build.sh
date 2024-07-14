@@ -10,7 +10,7 @@ cd "$SCRIPT_DIR"
 OUTPUT_DIR=~/"Downloads/"$(basename "$(pwd)")"-build/"
 
 if [ -z "$1" ]; then
-    git fetch && git merge origin/main && git push # Typically run after a PR to main, so bring dev up to date
+    git fetch && git merge origin/master && git push # Typically run after a PR to main, so bring dev up to date
 fi
 rm ./build/app/outputs/flutter-apk/* 2>/dev/null                                             # Get rid of older builds if any
 flutter build apk && flutter build apk --split-per-abi                                       # Build (both split and combined APKs)
