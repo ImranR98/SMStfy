@@ -1,6 +1,8 @@
 import 'dart:ui';
 
+import 'package:device_info_plus/device_info_plus.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:permission_handler/permission_handler.dart';
@@ -12,7 +14,14 @@ import 'package:smstfy/providers/notifications_provider.dart';
 import 'package:smstfy/providers/ntfy_provider.dart';
 import 'package:smstfy/providers/settings_provider.dart';
 
-void main() {
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  if ((await DeviceInfoPlugin().androidInfo).version.sdkInt >= 29) {
+    SystemChrome.setSystemUIOverlayStyle(
+      const SystemUiOverlayStyle(systemNavigationBarColor: Colors.transparent),
+    );
+    SystemChrome.setEnabledSystemUIMode(SystemUiMode.edgeToEdge);
+  }
   runApp(MultiProvider(
     providers: [
       ChangeNotifierProvider(create: (context) => SettingsProvider()),

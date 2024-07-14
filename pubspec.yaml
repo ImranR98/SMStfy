@@ -2,7 +2,7 @@ name: smstfy
 description: "SMS gateway powered by ntfy"
 publish_to: 'none'
 
-version: 1.0.0+1
+version: 1.0.1+2
 
 environment:
   sdk: '>=3.4.3 <4.0.0'
@@ -24,6 +24,7 @@ dependencies:
       url: https://github.com/EddieKamau/sms_advanced.git
       ref: master
   http: ^1.2.1
+  device_info_plus: ^10.1.0
 
 dev_dependencies:
   flutter_test:
