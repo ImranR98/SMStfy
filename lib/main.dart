@@ -1,6 +1,7 @@
 import 'dart:ui';
 
 import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:provider/provider.dart';
@@ -113,6 +114,70 @@ class _MainPageState extends State<MainPage> {
     return Scaffold(
         backgroundColor: Theme.of(context).colorScheme.surface,
         body: Scaffold(
+          floatingActionButton: FloatingActionButton(
+              onPressed: () {
+                showDialog(
+                    context: context,
+                    builder: (ctx) {
+                      return AlertDialog(
+                        title: const Text('Help'),
+                        content: const Column(
+                          mainAxisSize: MainAxisSize.min,
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text('SMS gateway powered by ntfy (ntfy.sh).'),
+                            SizedBox(
+                              height: 16,
+                            ),
+                            Text(
+                                'When you receive an SMS, SMStfy will send the message data to a ntfy server and topic of your choice.'),
+                            SizedBox(
+                              height: 16,
+                            ),
+                            Text(
+                                'By default, the official ntfy server and a random topic name is used.'),
+                            Divider(
+                              height: 32,
+                            ),
+                            Text(
+                              'Note:',
+                              style: TextStyle(fontWeight: FontWeight.bold),
+                            ),
+                            SizedBox(
+                              height: 16,
+                            ),
+                            Text('The app must remain open to work.'),
+                            SizedBox(
+                              height: 16,
+                            ),
+                            Text(
+                                'The app does not keep a message history (this is left to the ntfy server).'),
+                            SizedBox(
+                              height: 16,
+                            ),
+                            Text(
+                                'Errors are reported through notifications, are not stored in the app, and may be partly cut off due to length limitations.'),
+                            Text(
+                                'Enable Android\'s \'Notification History\' feature to ensure you can access past error messages and read them in their entirety.'),
+                            SizedBox(
+                              height: 16,
+                            ),
+                            Text(
+                                'Sending SMS from a ntfy topic subscription is currently not supported.')
+                          ],
+                        ),
+                        actions: <Widget>[
+                          TextButton(
+                            child: const Text('Okay'),
+                            onPressed: () {
+                              Navigator.of(context).pop();
+                            },
+                          ),
+                        ],
+                      );
+                    });
+              },
+              child: Text('?', style: Theme.of(context).textTheme.titleLarge)),
           body: Scrollbar(
               interactive: true,
               controller: scrollController,
