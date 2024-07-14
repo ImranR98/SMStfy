@@ -67,14 +67,14 @@ class _MainPageState extends State<MainPage> {
       (await Permission.ignoreBatteryOptimizations.isGranted) &&
       (await Permission.notification.isGranted);
   requestPermissions() async {
-    if (!await Permission.sms.isGranted) {
-      await Permission.sms.request();
-    }
     if (!await Permission.ignoreBatteryOptimizations.isGranted) {
       await Permission.ignoreBatteryOptimizations.request();
     }
     if (!await Permission.notification.isGranted) {
       await Permission.notification.request();
+    }
+    if (!await Permission.sms.isGranted) {
+      await Permission.sms.request();
     }
     setState(() {});
   }
@@ -82,6 +82,9 @@ class _MainPageState extends State<MainPage> {
   @override
   void initState() {
     super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      requestPermissions();
+    });
     SettingsProvider settingsProvider = SettingsProvider();
     NtfyProvider ntfyProvider = NtfyProvider();
     NotificationsProvider notificationsProvider = NotificationsProvider();
