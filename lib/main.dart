@@ -89,12 +89,8 @@ class _MainPageState extends State<MainPage> {
     settingsProvider.initializeSettings().whenComplete(() {
       receiver.onSmsReceived?.listen((SmsMessage msg) async {
         try {
-          await ntfyProvider.sendSMSNotification(
-              msg,
-              settingsProvider.ntfyUrl,
-              settingsProvider.receiveTopicName,
-              settingsProvider.ntfyUsername,
-              settingsProvider.ntfyPassword);
+          await ntfyProvider.sendSMSNotification(msg, settingsProvider.ntfyUrl,
+              settingsProvider.receiveTopicName, settingsProvider.ntfyAuthData);
         } catch (e) {
           notificationsProvider.notify(AppNotification(
               1,

@@ -13,8 +13,7 @@ class SettingsForm extends StatefulWidget {
 
 class _SettingsFormState extends State<SettingsForm> {
   final TextEditingController ntfyUrlController = TextEditingController();
-  final TextEditingController ntfyUsernameController = TextEditingController();
-  final TextEditingController ntfyPasswordController = TextEditingController();
+  final TextEditingController ntfyAuthDataController = TextEditingController();
   final TextEditingController receiveTopicNameController =
       TextEditingController();
   bool formEnabled = false;
@@ -27,6 +26,7 @@ class _SettingsFormState extends State<SettingsForm> {
       settingsProvider.initializeSettings();
     }
     ntfyUrlController.text = settingsProvider.ntfyUrl;
+    ntfyAuthDataController.text = settingsProvider.ntfyAuthData;
     receiveTopicNameController.text = settingsProvider.receiveTopicName;
     final _formKey = GlobalKey<FormState>();
 
@@ -59,32 +59,14 @@ class _SettingsFormState extends State<SettingsForm> {
                     const SizedBox(
                       height: 16,
                     ),
-                    Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Flexible(
-                            child: TextFormField(
-                          controller: ntfyUsernameController,
-                          autovalidateMode: AutovalidateMode.onUserInteraction,
-                          decoration: const InputDecoration(
-                            border: OutlineInputBorder(),
-                            labelText: 'ntfy username',
-                          ),
-                        )),
-                        const SizedBox(
-                          width: 16,
-                        ),
-                        Flexible(
-                            child: TextFormField(
-                          controller: ntfyPasswordController,
-                          autovalidateMode: AutovalidateMode.onUserInteraction,
-                          decoration: const InputDecoration(
-                            border: OutlineInputBorder(),
-                            labelText: 'ntfy password',
-                          ),
-                        )),
-                      ],
-                    ),
+                    Flexible(
+                        child: TextFormField(
+                      controller: ntfyAuthDataController,
+                      autovalidateMode: AutovalidateMode.onUserInteraction,
+                      decoration: const InputDecoration(
+                          border: OutlineInputBorder(),
+                          labelText: 'ntfy token or username:password'),
+                    )),
                     const SizedBox(
                       height: 16,
                     ),
@@ -115,10 +97,8 @@ class _SettingsFormState extends State<SettingsForm> {
                                   ntfyUrlController.value.text;
                               settingsProvider.receiveTopicName =
                                   receiveTopicNameController.value.text;
-                              settingsProvider.ntfyUsername =
-                                  ntfyUsernameController.value.text;
-                              settingsProvider.ntfyPassword =
-                                  ntfyPasswordController.value.text;
+                              settingsProvider.ntfyAuthData =
+                                  ntfyAuthDataController.value.text;
                               ScaffoldMessenger.of(context).showSnackBar(
                                 const SnackBar(content: Text('Saved')),
                               );
@@ -129,12 +109,15 @@ class _SettingsFormState extends State<SettingsForm> {
                         TextButton(
                           onPressed: () async {
                             try {
-                              await ntfyProvider.sendSMSNotification(
-                                  SmsMessage('SMStfy', 'Test message'),
-                                  settingsProvider.ntfyUrl,
-                                  settingsProvider.receiveTopicName,
-                                  settingsProvider.ntfyUsername,
-                                  settingsProvider.ntfyPassword);
+                              var result =
+                                  await ntfyProvider.sendSMSNotification(
+                                      SmsMessage('SMStfy', 'Test message'),
+                                      settingsProvider.ntfyUrl,
+                                      settingsProvider.receiveTopicName,
+                                      settingsProvider.ntfyAuthData);
+                              if (result.statusCode != 200) {
+                                throw result.body;
+                              }
                               ScaffoldMessenger.of(context).showSnackBar(
                                 const SnackBar(
                                     content: Text('Test Successful')),

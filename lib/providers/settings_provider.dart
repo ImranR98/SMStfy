@@ -44,21 +44,12 @@ class SettingsProvider with ChangeNotifier {
     notifyListeners();
   }
 
-  String get ntfyUsername {
-    return prefs?.getString('ntfyUsername') ?? '';
+  String get ntfyAuthData {
+    return prefs?.getString('ntfyAuthData') ?? '';
   }
 
-  set ntfyUsername(String ntfyUsername) {
-    prefs?.setString('ntfyUsername', ntfyUsername);
-    notifyListeners();
-  }
-
-  String get ntfyPassword {
-    return prefs?.getString('ntfyPassword') ?? '';
-  }
-
-  set ntfyPassword(String ntfyPassword) {
-    prefs?.setString('ntfyPassword', ntfyPassword);
+  set ntfyAuthData(String ntfyAuthData) {
+    prefs?.setString('ntfyAuthData', ntfyAuthData);
     notifyListeners();
   }
 }
