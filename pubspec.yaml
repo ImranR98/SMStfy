@@ -23,6 +23,7 @@ dependencies:
     git:
       url: https://github.com/EddieKamau/sms_advanced.git
       ref: master
+  http: ^1.2.1
 
 dev_dependencies:
   flutter_test:

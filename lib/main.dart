@@ -1,17 +1,21 @@
 import 'dart:ui';
 
 import 'package:flutter/material.dart';
+import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:provider/provider.dart';
 import 'package:sms_advanced/sms_advanced.dart';
 import 'package:smstfy/components/custom_app_bar.dart';
 import 'package:smstfy/components/settings_form.dart';
+import 'package:smstfy/providers/notifications_provider.dart';
+import 'package:smstfy/providers/ntfy_provider.dart';
 import 'package:smstfy/providers/settings_provider.dart';
 
 void main() {
   runApp(MultiProvider(
     providers: [
       ChangeNotifierProvider(create: (context) => SettingsProvider()),
+      ChangeNotifierProvider(create: (context) => NtfyProvider()),
     ],
     child: const SMStfy(),
   ));
@@ -60,7 +64,8 @@ class _MainPageState extends State<MainPage> {
 
   Future<bool> checkPermissions() async =>
       (await Permission.sms.isGranted) &&
-      (await Permission.ignoreBatteryOptimizations.isGranted);
+      (await Permission.ignoreBatteryOptimizations.isGranted) &&
+      (await Permission.notification.isGranted);
   requestPermissions() async {
     if (!await Permission.sms.isGranted) {
       await Permission.sms.request();
@@ -68,15 +73,39 @@ class _MainPageState extends State<MainPage> {
     if (!await Permission.ignoreBatteryOptimizations.isGranted) {
       await Permission.ignoreBatteryOptimizations.request();
     }
+    if (!await Permission.notification.isGranted) {
+      await Permission.notification.request();
+    }
     setState(() {});
   }
 
   @override
   void initState() {
     super.initState();
-    SmsReceiver receiver = new SmsReceiver();
-    receiver.onSmsReceived?.listen((SmsMessage msg) {
-      print(msg.body); // TODO: Post to Ntfy here and increment the counter.
+    SettingsProvider settingsProvider = SettingsProvider();
+    NtfyProvider ntfyProvider = NtfyProvider();
+    NotificationsProvider notificationsProvider = NotificationsProvider();
+    SmsReceiver receiver = SmsReceiver();
+    settingsProvider.initializeSettings().whenComplete(() {
+      receiver.onSmsReceived?.listen((SmsMessage msg) async {
+        try {
+          await ntfyProvider.sendSMSNotification(
+              msg,
+              settingsProvider.ntfyUrl,
+              settingsProvider.receiveTopicName,
+              settingsProvider.ntfyUsername,
+              settingsProvider.ntfyPassword);
+        } catch (e) {
+          notificationsProvider.notify(AppNotification(
+              1,
+              'Error Posting SMS',
+              e.toString(),
+              'ntfy_post_error',
+              'SMS Posting Error',
+              'These notifications tell you when an SMS could not be forwarded to the ntfy server.',
+              Importance.defaultImportance));
+        }
+      });
     });
   }
 

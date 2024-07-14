@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:sms_advanced/sms_advanced.dart';
+import 'package:smstfy/providers/ntfy_provider.dart';
 import 'package:smstfy/providers/settings_provider.dart';
 
 class SettingsForm extends StatefulWidget {
@@ -20,6 +22,7 @@ class _SettingsFormState extends State<SettingsForm> {
   @override
   Widget build(BuildContext context) {
     SettingsProvider settingsProvider = context.watch<SettingsProvider>();
+    NtfyProvider ntfyProvider = context.watch<NtfyProvider>();
     if (settingsProvider.prefs == null) {
       settingsProvider.initializeSettings();
     }
@@ -124,8 +127,36 @@ class _SettingsFormState extends State<SettingsForm> {
                           child: const Text('Save Settings'),
                         ),
                         TextButton(
-                          onPressed: () {
-                            // TODO: Test connection with current inputs and report result in snackbar
+                          onPressed: () async {
+                            try {
+                              await ntfyProvider.sendSMSNotification(
+                                  SmsMessage('SMStfy', 'Test message'),
+                                  settingsProvider.ntfyUrl,
+                                  settingsProvider.receiveTopicName,
+                                  settingsProvider.ntfyUsername,
+                                  settingsProvider.ntfyPassword);
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                const SnackBar(
+                                    content: Text('Test Successful')),
+                              );
+                            } catch (e) {
+                              showDialog(
+                                  context: context,
+                                  builder: (ctx) {
+                                    return AlertDialog(
+                                      title: const Text('Error'),
+                                      content: Text(e.toString()),
+                                      actions: <Widget>[
+                                        TextButton(
+                                          child: const Text('Okay'),
+                                          onPressed: () {
+                                            Navigator.of(context).pop();
+                                          },
+                                        ),
+                                      ],
+                                    );
+                                  });
+                            }
                           },
                           child: Text(
                             'Test',
